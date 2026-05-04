@@ -1,0 +1,63 @@
+---
+description: Core rules for live-class-assignment — always applied
+alwaysApply: true
+---
+
+# 핵심 규칙 — live-class-assignment
+
+## 기술 스택 (절대 변경 금지)
+
+| 계층 | 기술 |
+|---|---|
+| 프레임워크 | Next.js 16 (App Router) |
+| 언어 | TypeScript strict |
+| 폼 | react-hook-form 7.x |
+| 검증 | Zod 4.x |
+| 데이터 패칭 | ky + TanStack React Query 5.x |
+| 스타일링 | Tailwind CSS v3 |
+| 테스트 | Vitest + Testing Library |
+
+## 하드 제약
+
+- `as any` 금지 — 어떤 경우에도
+- `@ts-ignore` / `@ts-expect-error` 금지 — 어떤 경우에도
+- 외부 UI 라이브러리 금지 (Radix, MUI, Shadcn 등)
+- 인라인 스타일 금지 — Tailwind 유틸리티 클래스 사용
+- 폼 상태에 Context API 금지 — orchestrator 패턴 전용
+- 테스트 삭제 금지 — 빌드 통과용으로
+
+## 아키텍처
+
+```
+EnrollmentForm (오케스트레이터 — 모든 상태 보유, props로 전달)
+  ├── Step 1: 강의 선택     → localState (courseId, type)
+  ├── Step 2: 수강생 정보   → react-hook-form (name, email, phone…)
+  └── Step 3: 확인 + 제출   → localState + getValues() 병합
+
+lib/api/client.ts  ← ky를 직접 import하는 유일한 파일
+lib/db.ts          ← 파일 기반 DB (data/db.json), server-only
+```
+
+## 에러 응답 포맷
+
+```typescript
+{ code: string; message: string; details?: Record<string, string> }
+```
+에러 코드: `COURSE_FULL`, `DUPLICATE_ENROLLMENT`, `INVALID_INPUT`
+
+## 파일 컨벤션
+
+- 컴포넌트: `components/enrollment/` — `PascalCase.tsx`, `'use client'` 필수
+- API 라우트: `app/api/{resource}/route.ts` — `'server-only'` 임포트 필수
+- 클라이언트 래퍼: `lib/api/{resource}.ts` — `apiClient` 사용
+- 스키마: `lib/schemas/{domain}.ts`
+- 테스트: `test/{category}/{name}.test.tsx`
+
+## 태스크 완료 전 체크
+
+1. `npx tsc --noEmit` 클린
+2. `npm run build` 통과
+3. `npm run test` 통과 (새 실패 없음)
+4. 에러 메시지 한국어 확인
+5. 인라인 스타일 없음
+6. `as any` / `@ts-ignore` 없음
