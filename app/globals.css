@@ -6,5 +6,5 @@
 
 @layer base {
   *, *::before, *::after { box-sizing: border-box; }
-  body { @apply font-sans text-ink-1 bg-white antialiased; }
+  body { @apply font-sans text-ink-1 bg-[#F8FAFC] antialiased; }
 }
