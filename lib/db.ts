@@ -96,3 +96,10 @@ export function remove<K extends keyof DbSchema>(entity: K, id: string): boolean
   writeDb(db)
   return true
 }
+
+export function transaction<T>(fn: (db: DbSchema) => T): T {
+  const db = readDb()
+  const result = fn(db)
+  writeDb(db)
+  return result
+}

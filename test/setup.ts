@@ -1,4 +1,7 @@
 import '@testing-library/jest-dom'
+import { vi } from 'vitest'
+
+vi.mock('server-only', () => ({}))
 
 const makeStorage = () => {
   let store: Record<string, string> = {}

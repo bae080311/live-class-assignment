@@ -2,13 +2,11 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { POST } from '@/app/api/enrollments/route'
 
 vi.mock('@/lib/db', () => ({
-  getById: vi.fn(),
-  getAll: vi.fn(),
-  create: vi.fn(),
-  update: vi.fn(),
+  transaction: vi.fn(),
 }))
 
-import { getById, getAll, create, update } from '@/lib/db'
+import { transaction } from '@/lib/db'
+import type { DbSchema, Enrollment } from '@/lib/db'
 
 const mockCourse = {
   id: 'c1',
@@ -25,14 +23,14 @@ const mockCourse = {
   initial: 'UX',
 }
 
-const createdEnrollment = {
-  enrollmentId: 'ENR-TEST',
-  status: 'confirmed' as const,
-  enrolledAt: '2026-05-06T00:00:00.000Z',
-  courseId: 'c1',
-  type: 'personal' as const,
-  applicant: { name: '홍길동', email: 'hong@example.com', phone: '01012345678' },
-  agreedToTerms: true,
+function makeDb(
+  courseOverrides?: Partial<typeof mockCourse>,
+  enrollments: Enrollment[] = [],
+): DbSchema {
+  return {
+    courses: [{ ...mockCourse, ...courseOverrides }],
+    enrollments: [...enrollments],
+  } as unknown as DbSchema
 }
 
 function makeRequest(body: object) {
@@ -43,26 +41,17 @@ function makeRequest(body: object) {
   })
 }
 
-// 명세 기준 nested 구조
 const personalBody = {
   courseId: 'c1',
   type: 'personal',
-  applicant: {
-    name: '홍길동',
-    email: 'hong@example.com',
-    phone: '01012345678',
-  },
+  applicant: { name: '홍길동', email: 'hong@example.com', phone: '01012345678' },
   agreedToTerms: true,
 }
 
 const groupBody = {
   courseId: 'c1',
   type: 'group',
-  applicant: {
-    name: '이수진',
-    email: 'sujin@example.com',
-    phone: '01098765432',
-  },
+  applicant: { name: '이수진', email: 'sujin@example.com', phone: '01098765432' },
   group: {
     organizationName: '디자인팀',
     contactPerson: 'sujin@team.com',
@@ -76,11 +65,11 @@ const groupBody = {
   agreedToTerms: true,
 }
 
+let capturedDb: DbSchema
+
 beforeEach(() => {
-  vi.mocked(getById).mockReturnValue(mockCourse as ReturnType<typeof getById>)
-  vi.mocked(getAll).mockReturnValue([] as ReturnType<typeof getAll>)
-  vi.mocked(create).mockReturnValue(createdEnrollment as ReturnType<typeof create>)
-  vi.mocked(update).mockReturnValue(undefined as unknown as ReturnType<typeof update>)
+  capturedDb = makeDb()
+  vi.mocked(transaction).mockImplementation(fn => fn(capturedDb))
 })
 
 describe('POST /api/enrollments', () => {
@@ -88,28 +77,20 @@ describe('POST /api/enrollments', () => {
     const res = await POST(makeRequest(personalBody))
     expect(res.status).toBe(201)
     const json = await res.json()
-    expect(json.enrollmentId).toBe('ENR-TEST')
+    expect(json.enrollmentId).toMatch(/^ENR-/)
     expect(json.status).toBe('confirmed')
   })
 
   it('단체 신청 성공 — 201 반환', async () => {
-    vi.mocked(create).mockReturnValueOnce({
-      ...createdEnrollment,
-      enrollmentId: 'ENR-GROUP',
-      type: 'group',
-    } as ReturnType<typeof create>)
-
     const res = await POST(makeRequest(groupBody))
     expect(res.status).toBe(201)
     const json = await res.json()
-    expect(json.enrollmentId).toBe('ENR-GROUP')
+    expect(json.enrollmentId).toMatch(/^ENR-/)
   })
 
-  it('성공 후 currentEnrollment 증가 — update 호출됨', async () => {
+  it('성공 후 currentEnrollment 증가', async () => {
     await POST(makeRequest(personalBody))
-    expect(vi.mocked(update)).toHaveBeenCalledWith('courses', 'c1', {
-      currentEnrollment: 13,
-    })
+    expect((capturedDb.courses[0] as typeof mockCourse).currentEnrollment).toBe(13)
   })
 
   it('courseId 없으면 400 INVALID_INPUT', async () => {
@@ -120,7 +101,9 @@ describe('POST /api/enrollments', () => {
   })
 
   it('존재하지 않는 강의 — 400', async () => {
-    vi.mocked(getById).mockReturnValueOnce(null as unknown as ReturnType<typeof getById>)
+    vi.mocked(transaction).mockImplementationOnce(fn =>
+      fn({ courses: [], enrollments: [] } as unknown as DbSchema)
+    )
     const res = await POST(makeRequest(personalBody))
     expect(res.status).toBe(400)
     const json = await res.json()
@@ -128,10 +111,9 @@ describe('POST /api/enrollments', () => {
   })
 
   it('정원 초과 — 409 COURSE_FULL', async () => {
-    vi.mocked(getById).mockReturnValueOnce({
-      ...mockCourse,
-      currentEnrollment: 20,
-    } as ReturnType<typeof getById>)
+    vi.mocked(transaction).mockImplementationOnce(fn =>
+      fn(makeDb({ currentEnrollment: 20 }))
+    )
     const res = await POST(makeRequest(personalBody))
     expect(res.status).toBe(409)
     const json = await res.json()
@@ -139,9 +121,15 @@ describe('POST /api/enrollments', () => {
   })
 
   it('중복 신청 — 409 DUPLICATE_ENROLLMENT', async () => {
-    vi.mocked(getAll).mockReturnValueOnce([
-      { courseId: 'c1', applicant: { email: 'hong@example.com' } },
-    ] as ReturnType<typeof getAll>)
+    const existing: Enrollment = {
+      id: 'e1', enrollmentId: 'ENR-OLD', status: 'confirmed',
+      enrolledAt: '', createdAt: '', courseId: 'c1', type: 'personal',
+      applicant: { name: '홍길동', email: 'hong@example.com', phone: '01012345678' },
+      agreedToTerms: true,
+    }
+    vi.mocked(transaction).mockImplementationOnce(fn =>
+      fn(makeDb({}, [existing]))
+    )
     const res = await POST(makeRequest(personalBody))
     expect(res.status).toBe(409)
     const json = await res.json()
@@ -185,10 +173,7 @@ describe('POST /api/enrollments', () => {
   })
 
   it('단체 신청 조직명 누락 — 400 INVALID_INPUT', async () => {
-    const res = await POST(makeRequest({
-      ...groupBody,
-      group: { ...groupBody.group, organizationName: '' },
-    }))
+    const res = await POST(makeRequest({ ...groupBody, group: { ...groupBody.group, organizationName: '' } }))
     expect(res.status).toBe(400)
     const json = await res.json()
     expect(json.code).toBe('INVALID_INPUT')
