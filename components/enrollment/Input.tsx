@@ -19,6 +19,24 @@ const COMPACT_BASE =
   'bg-ink-5/30 border border-transparent rounded-[10px] px-3 py-2.5 text-sm w-full outline-none transition-all focus:bg-white focus:border-brand'
 const COMPACT_ERROR = 'border-danger bg-danger-soft'
 
+type TextareaProps = React.TextareaHTMLAttributes<HTMLTextAreaElement> & {
+  hasError?: boolean
+}
+
+export function Textarea({ hasError, className, ...props }: TextareaProps) {
+  return (
+    <textarea
+      className={cn(
+        DEFAULT_BASE,
+        hasError ? DEFAULT_ERROR : cn('border-ink-5', DEFAULT_FOCUS),
+        'resize-none min-h-[110px] leading-relaxed',
+        className
+      )}
+      {...props}
+    />
+  )
+}
+
 export function Input({ variant = 'default', hasError, filled, className, ...props }: Props) {
   if (variant === 'compact') {
     return (
