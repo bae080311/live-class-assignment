@@ -17,8 +17,6 @@ export const CourseSchema = z.object({
 
 export type Course = z.infer<typeof CourseSchema>
 
-const phoneRegex = /^01[016789]-?\d{3,4}-?\d{4}$/
-
 export const Step1Schema = z.object({
   courseId: z.string().min(1, '강의를 선택해주세요.'),
   type: z.enum(['personal', 'group']),
@@ -27,7 +25,7 @@ export const Step1Schema = z.object({
 const ApplicantSchema = z.object({
   name: z.string().min(2, '이름은 2자 이상이어야 해요.').max(20, '이름은 20자 이하로 입력해주세요.'),
   email: z.string().email('이메일 형식이 올바르지 않아요.'),
-  phone: z.string().min(1, '전화번호를 입력해주세요.').regex(phoneRegex, '올바른 전화번호 형식이 아니에요.'),
+  phone: z.string().regex(/^01[016789]\d{7,8}$/, '올바른 전화번호 형식이 아니에요. (예: 01012345678)'),
   motivation: z.string().max(300, '수강 동기는 300자 이하로 입력해주세요.').optional(),
 })
 
@@ -42,7 +40,7 @@ export const Step2GroupSchema = ApplicantSchema.extend({
       email: z.string().email('올바른 이메일 형식이 아니에요.'),
     })
   ),
-  contactPerson: z.string().min(1, '담당자 연락처를 입력해주세요.').regex(phoneRegex, '올바른 전화번호 형식이 아니에요.'),
+  contactPerson: z.string().min(1, '담당자 연락처를 입력해주세요.'),
 })
 
 export const Step3Schema = z.object({
@@ -54,7 +52,7 @@ export type EnrollmentFormData = {
   type: 'personal' | 'group'
   name: string
   email: string
-  phone?: string
+  phone: string
   motivation?: string
   organizationName?: string
   headCount?: number
@@ -69,8 +67,17 @@ export type EnrollmentResult = {
   enrolledAt: string
 }
 
+export const ERROR_CODES = {
+  INVALID_INPUT: 'INVALID_INPUT',
+  COURSE_FULL: 'COURSE_FULL',
+  DUPLICATE_ENROLLMENT: 'DUPLICATE_ENROLLMENT',
+  SERVER_ERROR: 'SERVER_ERROR',
+} as const
+
+export type ErrorCode = (typeof ERROR_CODES)[keyof typeof ERROR_CODES]
+
 export type ErrorResponse = {
-  code: 'COURSE_FULL' | 'DUPLICATE_ENROLLMENT' | 'INVALID_INPUT'
+  code: ErrorCode
   message: string
   details?: Record<string, string>
 }
