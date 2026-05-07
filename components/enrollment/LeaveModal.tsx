@@ -1,5 +1,7 @@
 'use client'
 
+import { Button } from './Button'
+
 type Props = {
   onStay: () => void
   onLeave: () => void
@@ -20,18 +22,12 @@ export function LeaveModal({ onStay, onLeave }: Props) {
           작성하던 내용은 안전하게 저장되어 있어서, 다음에 이어서 신청할 수 있어요.
         </p>
         <div className="flex gap-2">
-          <button
-            className="flex-1 h-[50px] px-4 text-ink-2 font-semibold rounded-xl bg-ink-5/50 hover:bg-ink-5/70 transition-colors border-none cursor-pointer"
-            onClick={onLeave}
-          >
+          <Button variant="secondary" className="flex-1 h-[50px]" onClick={onLeave}>
             나갈게요
-          </button>
-          <button
-            className="flex-1 h-[50px] px-4 bg-brand text-white font-semibold rounded-xl hover:bg-brand-hover active:scale-[0.98] transition-all border-none cursor-pointer"
-            onClick={onStay}
-          >
+          </Button>
+          <Button className="flex-1 h-[50px]" onClick={onStay}>
             이어서 작성
-          </button>
+          </Button>
         </div>
       </div>
     </div>

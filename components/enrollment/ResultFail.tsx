@@ -1,6 +1,7 @@
 'use client'
 
 import { IconAlertSm, IconRefresh, IconX } from '@/assets/svg'
+import { Button } from './Button'
 
 type Props = {
   errorMessage?: string
@@ -37,18 +38,12 @@ export function ResultFail({ errorMessage, onRetry, onBack }: Props) {
       </button>
 
       <div className="flex gap-3 p-5 border-t border-ink-5 bg-white mt-auto">
-        <button
-          className="w-24 h-14 flex-shrink-0 px-4 text-ink-2 font-semibold rounded-xl bg-ink-5/50 hover:bg-ink-5/70 transition-colors border-none cursor-pointer"
-          onClick={onBack}
-        >
+        <Button variant="secondary" className="w-24 h-14 flex-shrink-0" onClick={onBack}>
           취소
-        </button>
-        <button
-          className="flex-1 h-14 inline-flex items-center justify-center gap-2 bg-brand text-white font-semibold rounded-xl hover:bg-brand-hover active:scale-[0.98] transition-all border-none cursor-pointer"
-          onClick={onRetry}
-        >
+        </Button>
+        <Button className="flex-1 h-14" onClick={onRetry}>
           <IconRefresh /> 다시 시도하기
-        </button>
+        </Button>
       </div>
     </div>
   )
