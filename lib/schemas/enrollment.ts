@@ -11,8 +11,6 @@ export const CourseSchema = z.object({
   startDate: z.string(),
   endDate: z.string(),
   price: z.number(),
-  thumb: z.string(),
-  initial: z.string(),
 })
 
 export type Course = z.infer<typeof CourseSchema>

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { formatPrice, formatDate, THUMB_GRADIENTS, CATEGORY_MAP, CHIP_LABELS } from '@/lib/constants/enrollment'
+import { formatPrice, formatDate, CATEGORY_MAP, CHIP_LABELS } from '@/lib/constants/enrollment'
 
 describe('formatPrice', () => {
   it('89000 → 89,000원', () => {
@@ -44,17 +44,6 @@ describe('formatDate', () => {
     const result = formatDate('2026-07-02T19:00:00+09:00')
     expect(result).toContain('2026')
     expect(result).toContain('7')
-  })
-})
-
-describe('THUMB_GRADIENTS', () => {
-  it('thumb-1 ~ thumb-6 키 존재', () => {
-    expect(THUMB_GRADIENTS['thumb-1']).toBeDefined()
-    expect(THUMB_GRADIENTS['thumb-6']).toBeDefined()
-  })
-
-  it('linear-gradient 값 포함', () => {
-    expect(THUMB_GRADIENTS['thumb-1']).toContain('linear-gradient')
   })
 })
 

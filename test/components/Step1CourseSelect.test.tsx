@@ -4,9 +4,9 @@ import { Step1CourseSelect } from '@/components/enrollment/Step1CourseSelect'
 import type { Course, EnrollmentFormData } from '@/lib/schemas/enrollment'
 
 const mockCourses: Course[] = [
-  { id: 'c1', category: 'design', title: 'UX 라이팅 실전', instructor: '김유나', description: '실무 UX', maxCapacity: 20, currentEnrollment: 12, startDate: '2026-06-10T09:00:00+09:00', endDate: '2026-06-10T13:00:00+09:00', price: 89000, thumb: 'thumb-1', initial: 'UX' },
-  { id: 'c2', category: 'design', title: '제품 사고와 디자인 시스템', instructor: '박재형', description: '디자인 시스템', maxCapacity: 15, currentEnrollment: 8, startDate: '2026-06-15T19:00:00+09:00', endDate: '2026-07-13T21:00:00+09:00', price: 129000, thumb: 'thumb-4', initial: 'PD' },
-  { id: 'c3', category: 'development', title: 'React 깊이 있게 다루기', instructor: '이민서', description: 'React 고급', maxCapacity: 20, currentEnrollment: 20, startDate: '2026-06-22T10:00:00+09:00', endDate: '2026-07-13T12:00:00+09:00', price: 159000, thumb: 'thumb-5', initial: 'RX' },
+  { id: 'c1', category: 'design', title: 'UX 라이팅 실전', instructor: '김유나', description: '실무 UX', maxCapacity: 20, currentEnrollment: 12, startDate: '2026-06-10T09:00:00+09:00', endDate: '2026-06-10T13:00:00+09:00', price: 89000 },
+  { id: 'c2', category: 'design', title: '제품 사고와 디자인 시스템', instructor: '박재형', description: '디자인 시스템', maxCapacity: 15, currentEnrollment: 8, startDate: '2026-06-15T19:00:00+09:00', endDate: '2026-07-13T21:00:00+09:00', price: 129000 },
+  { id: 'c3', category: 'development', title: 'React 깊이 있게 다루기', instructor: '이민서', description: 'React 고급', maxCapacity: 20, currentEnrollment: 20, startDate: '2026-06-22T10:00:00+09:00', endDate: '2026-07-13T12:00:00+09:00', price: 159000 },
 ]
 
 function renderStep1(

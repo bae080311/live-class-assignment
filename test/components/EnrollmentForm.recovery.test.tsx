@@ -14,7 +14,7 @@ vi.mock('@/lib/api/courses', () => ({
         id: 'c1', category: 'design', title: 'UX 라이팅 실전', instructor: '김유나',
         description: '실무 UX', maxCapacity: 20, currentEnrollment: 12,
         startDate: '2026-06-10T09:00:00+09:00', endDate: '2026-06-10T13:00:00+09:00',
-        price: 89000, thumb: 'thumb-1', initial: 'UX',
+        price: 89000,
       },
     ],
     categories: ['design', 'development', 'marketing', 'business'],

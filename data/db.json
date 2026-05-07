@@ -1,11 +1,11 @@
 {
   "courses": [
-    {"id":"c1","category":"design","title":"UX 라이팅 실전","instructor":"김유나","description":"실무에서 바로 쓰는 UX 라이팅 원칙과 사례","maxCapacity":20,"currentEnrollment":12,"startDate":"2026-06-10T09:00:00+09:00","endDate":"2026-06-10T13:00:00+09:00","price":89000,"thumb":"thumb-1","initial":"UX"},
-    {"id":"c2","category":"design","title":"제품 사고와 디자인 시스템","instructor":"박재형","description":"프로덕트 씽킹과 확장 가능한 디자인 시스템 설계","maxCapacity":15,"currentEnrollment":8,"startDate":"2026-06-15T19:00:00+09:00","endDate":"2026-07-13T21:00:00+09:00","price":129000,"thumb":"thumb-4","initial":"PD"},
-    {"id":"c3","category":"development","title":"React 깊이 있게 다루기","instructor":"이민서","description":"렌더링 최적화부터 고급 패턴까지","maxCapacity":20,"currentEnrollment":20,"startDate":"2026-06-22T10:00:00+09:00","endDate":"2026-07-13T12:00:00+09:00","price":159000,"thumb":"thumb-5","initial":"RX"},
-    {"id":"c4","category":"development","title":"실전 프론트엔드 아키텍처","instructor":"정승호","description":"대규모 SPA를 위한 아키텍처 설계 전략","maxCapacity":12,"currentEnrollment":5,"startDate":"2026-07-02T19:00:00+09:00","endDate":"2026-07-30T21:00:00+09:00","price":189000,"thumb":"thumb-2","initial":"FE"},
-    {"id":"c5","category":"marketing","title":"SQL로 일하는 사람의 데이터 분석","instructor":"한지원","description":"비개발자를 위한 실전 SQL 데이터 분석","maxCapacity":30,"currentEnrollment":18,"startDate":"2026-06-18T10:00:00+09:00","endDate":"2026-06-18T18:00:00+09:00","price":99000,"thumb":"thumb-6","initial":"SQ"},
-    {"id":"c6","category":"business","title":"제안서가 잘 읽히는 5가지 원칙","instructor":"서가은","description":"설득력 있는 비즈니스 제안서 작성법","maxCapacity":50,"currentEnrollment":3,"startDate":"2026-06-26T14:00:00+09:00","endDate":"2026-06-26T16:00:00+09:00","price":49000,"thumb":"thumb-3","initial":"BZ"}
+    {"id":"c1","category":"design","title":"UX 라이팅 실전","instructor":"김유나","description":"실무에서 바로 쓰는 UX 라이팅 원칙과 사례","maxCapacity":20,"currentEnrollment":12,"startDate":"2026-06-10T09:00:00+09:00","endDate":"2026-06-10T13:00:00+09:00","price":89000},
+    {"id":"c2","category":"design","title":"제품 사고와 디자인 시스템","instructor":"박재형","description":"프로덕트 씽킹과 확장 가능한 디자인 시스템 설계","maxCapacity":15,"currentEnrollment":8,"startDate":"2026-06-15T19:00:00+09:00","endDate":"2026-07-13T21:00:00+09:00","price":129000},
+    {"id":"c3","category":"development","title":"React 깊이 있게 다루기","instructor":"이민서","description":"렌더링 최적화부터 고급 패턴까지","maxCapacity":20,"currentEnrollment":20,"startDate":"2026-06-22T10:00:00+09:00","endDate":"2026-07-13T12:00:00+09:00","price":159000},
+    {"id":"c4","category":"development","title":"실전 프론트엔드 아키텍처","instructor":"정승호","description":"대규모 SPA를 위한 아키텍처 설계 전략","maxCapacity":12,"currentEnrollment":5,"startDate":"2026-07-02T19:00:00+09:00","endDate":"2026-07-30T21:00:00+09:00","price":189000},
+    {"id":"c5","category":"marketing","title":"SQL로 일하는 사람의 데이터 분석","instructor":"한지원","description":"비개발자를 위한 실전 SQL 데이터 분석","maxCapacity":30,"currentEnrollment":18,"startDate":"2026-06-18T10:00:00+09:00","endDate":"2026-06-18T18:00:00+09:00","price":99000},
+    {"id":"c6","category":"business","title":"제안서가 잘 읽히는 5가지 원칙","instructor":"서가은","description":"설득력 있는 비즈니스 제안서 작성법","maxCapacity":50,"currentEnrollment":3,"startDate":"2026-06-26T14:00:00+09:00","endDate":"2026-06-26T16:00:00+09:00","price":49000}
   ],
   "enrollments": []
 }

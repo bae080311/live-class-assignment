@@ -16,8 +16,6 @@ const mockCourses: Course[] = [
     startDate: '2026-06-10T09:00:00+09:00',
     endDate: '2026-06-10T13:00:00+09:00',
     price: 89000,
-    thumb: 'thumb-1',
-    initial: 'UX',
   },
 ]
 
