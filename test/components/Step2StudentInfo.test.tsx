@@ -1,22 +1,22 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import { Step2StudentInfo } from '@/components/enrollment/Step2StudentInfo'
-import type { EnrollmentFormData } from '@/lib/schemas/enrollment'
+import type { EnrollmentFormData, RHFData } from '@/lib/schemas/enrollment'
 import type { UseFormRegister, FieldErrors } from 'react-hook-form'
 
-function makeRegister(): UseFormRegister<EnrollmentFormData> {
+function makeRegister(): UseFormRegister<RHFData> {
   return ((name: string) => ({
     name,
     ref: vi.fn(),
     onChange: vi.fn(),
     onBlur: vi.fn(),
-  })) as unknown as UseFormRegister<EnrollmentFormData>
+  })) as unknown as UseFormRegister<RHFData>
 }
 
 function renderStep2(
   state: Partial<EnrollmentFormData> = { type: 'personal', name: '', email: '' },
   set = vi.fn(),
-  errors: FieldErrors<EnrollmentFormData> = {}
+  errors: FieldErrors<RHFData> = {}
 ) {
   return render(
     <Step2StudentInfo
