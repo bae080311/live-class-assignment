@@ -89,6 +89,7 @@ describe('create', () => {
       applicant: {
         name: '홍길동',
         email: 'hong@example.com',
+        phone: '01012345678',
       },
       agreedToTerms: true,
     })
@@ -111,6 +112,7 @@ describe('create', () => {
       applicant: {
         name: '김철수',
         email: 'kim@example.com',
+        phone: '01098765432',
       },
       agreedToTerms: true,
     })
@@ -129,6 +131,7 @@ describe('remove', () => {
       applicant: {
         name: '테스트',
         email: 'test@test.com',
+        phone: '01011112222',
       },
       agreedToTerms: true,
     })
