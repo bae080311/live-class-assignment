@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
 import { renderHook, act } from '@testing-library/react'
 import { useFormPersistence } from '@/lib/hooks/useFormPersistence'
 import type { EnrollmentFormData } from '@/lib/schemas/enrollment'
@@ -21,12 +21,18 @@ const baseRhf = { name: '홍길동', email: 'hong@example.com', motivation: '' }
 
 beforeEach(() => {
   localStorage.clear()
+  vi.useFakeTimers()
+})
+
+afterEach(() => {
+  vi.useRealTimers()
 })
 
 describe('useFormPersistence', () => {
   describe('저장 (save)', () => {
     it('courseId가 있으면 step 1에서도 localStorage에 저장됨', () => {
       renderHook(() => useFormPersistence(baseLocal, baseRhf, 1))
+      vi.runAllTimers()
       const raw = localStorage.getItem('enrollment-form-draft')
       expect(raw).not.toBeNull()
       const saved = JSON.parse(raw!)
@@ -36,21 +42,25 @@ describe('useFormPersistence', () => {
 
     it('courseId 없고 step 1이면 저장하지 않음 (초기 상태)', () => {
       renderHook(() => useFormPersistence(emptyLocal, baseRhf, 1))
+      vi.runAllTimers()
       expect(localStorage.getItem('enrollment-form-draft')).toBeNull()
     })
 
     it('step 2이면 courseId 없어도 저장됨', () => {
       renderHook(() => useFormPersistence(emptyLocal, baseRhf, 2))
+      vi.runAllTimers()
       expect(localStorage.getItem('enrollment-form-draft')).not.toBeNull()
     })
 
     it('step이 "success"이면 저장하지 않음', () => {
       renderHook(() => useFormPersistence(baseLocal, baseRhf, 'success'))
+      vi.runAllTimers()
       expect(localStorage.getItem('enrollment-form-draft')).toBeNull()
     })
 
     it('step이 "fail"이면 저장하지 않음', () => {
       renderHook(() => useFormPersistence(baseLocal, baseRhf, 'fail'))
+      vi.runAllTimers()
       expect(localStorage.getItem('enrollment-form-draft')).toBeNull()
     })
 
@@ -62,6 +72,7 @@ describe('useFormPersistence', () => {
       )
 
       rerender({ local: { ...baseLocal, courseId: 'c2' } })
+      vi.runAllTimers()
 
       const raw = localStorage.getItem('enrollment-form-draft')
       const saved = JSON.parse(raw!)

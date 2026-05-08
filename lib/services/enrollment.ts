@@ -99,7 +99,7 @@ export function createEnrollment(body: RequestBody): EnrollmentResult {
 
   const { courseId, type } = step1.data
   const now = new Date().toISOString()
-  const enrollmentId = `ENR-${Date.now()}`
+  const enrollmentId = `ENR-${crypto.randomUUID().split('-')[0].toUpperCase()}`
 
   const enrollment = transaction(db => {
     const course = db.courses.find(c => c.id === courseId)

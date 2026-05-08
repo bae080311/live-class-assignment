@@ -41,9 +41,8 @@ export function Step1CourseSelect({ state, set, showError, courses, isLoading }:
       )}
 
       <div
-        className="flex gap-2 overflow-x-auto pb-1 -mx-5 px-5 scrollbar-none"
+        className="flex gap-2 overflow-x-auto pb-1 -mx-5 px-5 scrollbar-none [scrollbar-width:none]"
         role="tablist"
-        style={{ scrollbarWidth: 'none' }}
       >
         {CHIP_LABELS.map(c => (
           <button
@@ -73,10 +72,9 @@ export function Step1CourseSelect({ state, set, showError, courses, isLoading }:
               <div
                 key={c.id}
                 className={cn(
-                  'bg-white rounded-xl p-4 grid gap-3.5 items-center border cursor-pointer transition-all',
+                  'bg-white rounded-xl p-4 grid gap-3.5 items-center border cursor-pointer transition-all [grid-template-columns:1fr_auto]',
                   isSel ? 'border-brand shadow-md ring-1 ring-brand/20' : 'border-ink-5 hover:shadow-md'
                 )}
-                style={{ gridTemplateColumns: '1fr auto' }}
                 onClick={() => set({ courseId: c.id })}
                 role="button"
                 aria-pressed={isSel}
@@ -102,7 +100,6 @@ export function Step1CourseSelect({ state, set, showError, courses, isLoading }:
                     'absolute top-3 right-3 w-[22px] h-[22px] rounded-full border-[1.5px] grid place-items-center transition-all',
                     isSel ? 'bg-brand border-brand opacity-100' : 'border-ink-4 bg-white opacity-0'
                   )}
-                  style={{ position: 'absolute', top: 12, right: 12 }}
                 >
                   <IconCheck className={cn(isSel ? 'text-white' : 'text-transparent')} />
                 </div>

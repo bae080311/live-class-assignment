@@ -21,21 +21,26 @@ function readDraft(): Draft | null {
   }
 }
 
-function checkPersistenceAvailable(): boolean {
-  try {
-    localStorage.setItem('__enrollment_test__', '1')
-    localStorage.removeItem('__enrollment_test__')
-    return true
-  } catch {
-    return false
+// 모듈 레벨에서 한 번만 실행 — getSnapshot은 순수 함수여야 하므로 side-effect를 캐싱
+let _persistenceAvailable: boolean | null = null
+function getPersistenceAvailable(): boolean {
+  if (_persistenceAvailable === null) {
+    try {
+      localStorage.setItem('__enrollment_test__', '1')
+      localStorage.removeItem('__enrollment_test__')
+      _persistenceAvailable = true
+    } catch {
+      _persistenceAvailable = false
+    }
   }
+  return _persistenceAvailable
 }
 
 function writeDraft(draft: Draft): void {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(draft))
   } catch {
-    // quota 초과 등 런타임 실패는 무시 (마운트 시 가용 여부를 이미 확인함)
+    // quota 초과 등 런타임 실패는 무시
   }
 }
 
@@ -47,6 +52,16 @@ function removeDraft(): void {
   }
 }
 
+// 디바운스: 입력마다 디스크 I/O 방지
+function debounce<T extends unknown[]>(fn: (...args: T) => void, ms: number) {
+  let timer: ReturnType<typeof setTimeout>
+  return (...args: T) => {
+    clearTimeout(timer)
+    timer = setTimeout(() => fn(...args), ms)
+  }
+}
+
+const debouncedWriteDraft = debounce(writeDraft, 500)
 
 const listeners = new Set<() => void>()
 
@@ -77,7 +92,7 @@ export function useFormPersistence(
 
   const persistenceAvailable = useSyncExternalStore(
     () => () => {},
-    checkPersistenceAvailable,
+    getPersistenceAvailable,
     () => true
   )
 
@@ -89,7 +104,7 @@ export function useFormPersistence(
     if (typeof step !== 'number') return
     const hasData = Boolean(local.courseId) || step > 1
     if (!hasData) return
-    writeDraft({ local, rhf, step: step as 1 | 2 | 3 })
+    debouncedWriteDraft({ local, rhf, step: step as 1 | 2 | 3 })
     emitChange()
   }, [local, rhf, step])
 
