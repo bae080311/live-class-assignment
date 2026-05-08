@@ -22,7 +22,7 @@ export const Step1Schema = z.object({
 
 const ApplicantSchema = z.object({
   name: z.string().min(2, '이름은 2자 이상이어야 해요.').max(20, '이름은 20자 이하로 입력해주세요.'),
-  email: z.string().email('이메일 형식이 올바르지 않아요.'),
+  email: z.email({ error: '이메일 형식이 올바르지 않아요.' }),
   phone: z.string().regex(/^01[016789]\d{7,8}$/, '올바른 전화번호 형식이 아니에요. (예: 01012345678)'),
   motivation: z.string().max(300, '수강 동기는 300자 이하로 입력해주세요.').optional(),
 })
@@ -35,10 +35,18 @@ export const Step2GroupSchema = ApplicantSchema.extend({
   participants: z.array(
     z.object({
       name: z.string().min(1, '참가자 이름을 입력해주세요.'),
-      email: z.string().email('올바른 이메일 형식이 아니에요.'),
+      email: z.email({ error: '올바른 이메일 형식이 아니에요.' }),
     })
   ),
   contactPerson: z.string().min(1, '담당자 연락처를 입력해주세요.'),
+}).superRefine((data, ctx) => {
+  if (data.participants.length !== data.headCount) {
+    ctx.addIssue({
+      code: 'custom',
+      message: '참가자 수가 신청 인원과 일치하지 않아요.',
+      path: ['participants'],
+    })
+  }
 })
 
 export const Step3Schema = z.object({
@@ -59,11 +67,15 @@ export type EnrollmentFormData = {
   agreed?: boolean
 }
 
+export type RHFData = Required<EnrollmentFormData>
+
 export type EnrollmentResult = {
   enrollmentId: string
   status: 'confirmed' | 'pending'
   enrolledAt: string
 }
+
+export type SaveState = 'saved' | 'saving' | 'fail'
 
 export const ERROR_CODES = {
   INVALID_INPUT: 'INVALID_INPUT',
