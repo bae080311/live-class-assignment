@@ -5,7 +5,7 @@ import { formatDate } from '@/lib/constants/enrollment'
 import { useCopyFeedback } from '@/lib/hooks/useCopyFeedback'
 import { IconCopy, IconCheck } from '@/assets/svg'
 import { Button } from './Button'
-import { SectionHeader, DataRow } from './SectionCard'
+import { SectionCard, SectionHeader, DataRow } from './SectionCard'
 
 type Props = {
   state: Partial<EnrollmentFormData>
@@ -57,7 +57,7 @@ export function ResultSuccess({ state, enrollmentId, courses, onReset }: Props) 
       </div>
 
       <div className="mt-2">
-        <div className="bg-white rounded-xl border border-ink-5 overflow-hidden">
+        <SectionCard>
           <SectionHeader title="신청 요약" />
           <DataRow label="강의">{course?.title || '—'}</DataRow>
           <DataRow label="일정">{course?.startDate ? formatDate(course.startDate) : '—'}</DataRow>
@@ -65,7 +65,7 @@ export function ResultSuccess({ state, enrollmentId, courses, onReset }: Props) 
           <DataRow label="유형" last>
             {state.type === 'group' ? `단체 · ${state.headCount}명` : '개인'}
           </DataRow>
-        </div>
+        </SectionCard>
       </div>
 
       <div className="flex gap-3 p-5 border-t border-ink-5 bg-white mt-auto">
