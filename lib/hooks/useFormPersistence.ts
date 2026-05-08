@@ -74,7 +74,12 @@ export function useFormPersistence(
   step: number | string
 ) {
   const [bannerActed, setBannerActed] = useState(() => !getSnapshot())
-  const [persistenceAvailable] = useState(checkPersistenceAvailable)
+
+  const persistenceAvailable = useSyncExternalStore(
+    () => () => {},
+    checkPersistenceAvailable,
+    () => true
+  )
 
   const storageHasDraft = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot)
 
