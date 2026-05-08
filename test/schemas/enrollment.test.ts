@@ -171,7 +171,7 @@ describe('validateStep2Personal', () => {
   })
 
   it('전화번호 누락 시 실패 반환', () => {
-    const { phone: _, ...noPhone } = valid
+    const noPhone = Object.fromEntries(Object.entries(valid).filter(([k]) => k !== 'phone'))
     expect(validateStep2Personal(noPhone as typeof valid).success).toBe(false)
   })
 
