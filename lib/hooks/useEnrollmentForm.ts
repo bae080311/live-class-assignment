@@ -87,7 +87,7 @@ export function useEnrollmentForm() {
 
   const watchedRHF = useWatch({ control }) as Record<string, unknown>
 
-  const { hasDraft, recover, dismiss, clear } = useFormPersistence(localState, watchedRHF, step)
+  const { hasDraft, recover, dismiss, clear, persistenceAvailable } = useFormPersistence(localState, watchedRHF, step)
 
   useEffect(() => {
     const isDirty = Boolean(localState.courseId) || (typeof step === 'number' && step > 1)
@@ -217,6 +217,7 @@ export function useEnrollmentForm() {
     watchedRHF,
     isPending: mutation.isPending,
     hasDraft,
+    persistenceAvailable,
     dismiss,
     handleNext,
     handleBack,

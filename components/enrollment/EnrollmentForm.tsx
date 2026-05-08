@@ -22,7 +22,7 @@ export function EnrollmentForm() {
     courses, coursesLoading,
     register, errors, watchedRHF,
     isPending,
-    hasDraft, dismiss,
+    hasDraft, persistenceAvailable, dismiss,
     handleNext, handleBack, handleReset, handleRecover, handleJumpTo,
   } = useEnrollmentForm()
 
@@ -44,6 +44,12 @@ export function EnrollmentForm() {
             <div className="flex flex-col gap-5 px-5 py-6 flex-1 pb-36">
               {typeof step === 'number' && step >= 2 && !isResult && (
                 <SaveBanner state={saveState} />
+              )}
+
+              {typeof step === 'number' && !persistenceAvailable && !isResult && (
+                <div className="text-xs text-ink-3 px-4 py-2.5 bg-ink-5/60 rounded-lg border border-ink-5">
+                  자동 저장을 사용할 수 없어요. 완료 전 창을 닫으면 내용이 사라져요.
+                </div>
               )}
 
               {step === 1 && (
