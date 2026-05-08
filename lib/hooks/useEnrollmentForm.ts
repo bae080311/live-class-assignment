@@ -193,7 +193,7 @@ export function useEnrollmentForm() {
 
   const isResult = step === 'success' || step === 'fail'
   const numericStep = typeof step === 'number' ? step : 0
-  const mergedState = { ...localState, ...getValues(), agreed: localState.agreed, courseId: localState.courseId }
+  const mergedState = { ...localState, ...watchedRHF, agreed: localState.agreed, courseId: localState.courseId }
 
   return {
     step,
