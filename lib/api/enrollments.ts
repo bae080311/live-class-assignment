@@ -10,6 +10,10 @@ export async function submitEnrollment(data: EnrollmentFormData): Promise<Enroll
     ...(data.motivation ? { motivation: data.motivation } : {}),
   }
 
+  if (data.type === 'group' && (!data.organizationName || data.headCount === undefined || !data.participants || !data.contactPerson)) {
+    throw new Error('단체 신청 정보가 올바르지 않아요.')
+  }
+
   const body =
     data.type === 'group'
       ? {
@@ -17,10 +21,10 @@ export async function submitEnrollment(data: EnrollmentFormData): Promise<Enroll
           type: 'group' as const,
           applicant,
           group: {
-            organizationName: data.organizationName!,
-            headCount: data.headCount!,
-            participants: data.participants!,
-            contactPerson: data.contactPerson!,
+            organizationName: data.organizationName as string,
+            headCount: data.headCount as number,
+            participants: data.participants as { name: string; email: string }[],
+            contactPerson: data.contactPerson as string,
           },
           agreedToTerms: true,
         }
