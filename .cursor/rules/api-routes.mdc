@@ -1,0 +1,74 @@
+---
+description: Rules for Next.js API route handlers — validation, error format, status codes
+globs: app/api/*/route.ts
+alwaysApply: false
+---
+
+# API 라우트 규칙 — app/api/*/route.ts
+
+## 필수 사항
+
+1. 파일 상단에 `import 'server-only'`
+2. `try/catch`로 감싸기 — 예상치 못한 에러 시 500 반환
+3. 모든 입력을 Zod 스키마로 재검증 (클라이언트 신뢰 금지)
+4. `safeParse()` 사용 — `parse()` 금지
+5. 에러 반환 형식: `{ code, message, details? }`
+6. HTTP 상태 코드: 201 (성공), 400 (검증), 409 (충돌), 500 (서버)
+7. 에러 메시지 한국어
+8. DB 접근: `getAll`, `getById`, `create`, `remove` 함수 사용
+
+## 라우트 핸들러 템플릿
+
+```typescript
+import 'server-only'
+import { NextResponse } from 'next/server'
+import { getAll, getById, create, remove } from '@/lib/db'
+
+export async function GET(request: Request) {
+  try {
+    const { searchParams } = new URL(request.url)
+    // 로직
+    return NextResponse.json({ data })
+  } catch {
+    return NextResponse.json(
+      { code: 'INVALID_INPUT', message: '서버 오류가 발생했습니다' },
+      { status: 500 }
+    )
+  }
+}
+
+export async function POST(request: Request) {
+  try {
+    const body = await request.json()
+    // 1. Zod 검증 (safeParse)
+    // 2. 강의 존재 확인 → 400
+    // 3. 정원 확인 → 409 COURSE_FULL
+    // 4. 중복 신청 확인 → 409 DUPLICATE_ENROLLMENT
+    // 5. DB 저장
+    return NextResponse.json(result, { status: 201 })
+  } catch {
+    return NextResponse.json(
+      { code: 'INVALID_INPUT', message: '서버 오류가 발생했습니다' },
+      { status: 500 }
+    )
+  }
+}
+```
+
+## 비즈니스 로직 체크 순서 (POST /enrollments)
+
+1. Step1Schema 검증 → 400 `INVALID_INPUT`
+2. Step2 검증 (Personal 또는 Group) → 400 `INVALID_INPUT`
+3. Step3Schema 검증 (약관) → 400 `INVALID_INPUT`
+4. 강의 존재 확인 → 400 `INVALID_INPUT`
+5. 정원 확인 → 409 `COURSE_FULL`
+6. 중복 신청 확인 → 409 `DUPLICATE_ENROLLMENT`
+
+## 안티패턴
+
+- ❌ `'server-only'` 임포트 누락
+- ❌ 서버 측 Zod 검증 건너뜀
+- ❌ 영어 에러 메시지
+- ❌ `try/catch` 누락
+- ❌ 잘못된 HTTP 상태 코드 (4xx/5xx 구분)
+- ❌ `data/db.json` 직접 조작

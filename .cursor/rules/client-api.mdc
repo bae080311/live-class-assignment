@@ -1,0 +1,79 @@
+---
+description: Rules for client-side API wrappers — ky apiClient, React Query, error handling
+globs: lib/api/*.ts
+alwaysApply: false
+---
+
+# 클라이언트 API 래퍼 규칙 — lib/api/*.ts
+
+## 핵심 원칙
+
+`lib/api/client.ts`만 `ky`를 직접 import한다. 모든 다른 래퍼는 `apiClient`를 사용한다.
+
+```typescript
+// lib/api/client.ts — ky를 직접 import하는 유일한 파일
+import ky from 'ky'
+export const apiClient = ky.create({ retry: 0, timeout: 10000 })
+```
+
+## 필수 사항
+
+1. 타입 명시된 async 함수로 export
+2. `HTTPError` 캐치로 사용자 정의 에러 메시지 처리
+3. TanStack React Query와 함께 사용 — raw `useEffect` 금지
+4. 에러 메시지 한국어
+
+## GET 래퍼 템플릿
+
+```typescript
+import { apiClient } from './client'
+import type { ResponseType } from '@/lib/schemas/enrollment'
+
+export async function fetchResource(param?: string): Promise<ResponseType> {
+  const searchParams = param ? { q: param } : undefined
+  return apiClient.get('/api/resource', { searchParams }).json<ResponseType>()
+}
+```
+
+## POST 래퍼 템플릿
+
+```typescript
+import { HTTPError } from 'ky'
+import { apiClient } from './client'
+
+export async function createResource(data: RequestType): Promise<ResponseType> {
+  try {
+    return await apiClient.post('/api/resource', { json: data }).json<ResponseType>()
+  } catch (error) {
+    if (error instanceof HTTPError) {
+      const err = await error.response.json().catch(() => ({}))
+      throw new Error((err as { message?: string }).message ?? '요청을 처리할 수 없습니다')
+    }
+    throw new Error('네트워크 오류가 발생했습니다')
+  }
+}
+```
+
+## React Query 패턴
+
+```typescript
+const { data } = useQuery({
+  queryKey: ['resource', param],
+  queryFn: () => fetchResource(param),
+})
+
+const mutation = useMutation({
+  mutationFn: (data: RequestType) => createResource(data),
+  onSuccess: (result) => { /* 처리 */ },
+  onError: (error) => { /* 처리 */ },
+})
+```
+
+## 안티패턴
+
+- ❌ `ky` 직접 import (`lib/api/client.ts` 제외)
+- ❌ `res.ok` 수동 체크 (ky가 자동 처리)
+- ❌ `JSON.stringify(body)` (ky의 `json` 옵션 사용)
+- ❌ 영어 에러 메시지
+- ❌ 데이터 패칭에 `useEffect` (React Query 사용)
+- ❌ `as any` 타입 캐스팅

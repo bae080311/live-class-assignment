@@ -1,0 +1,77 @@
+---
+description: Rules for Vitest test files — mocking, user flows, coverage targets
+globs: test/**/*.test.tsx
+alwaysApply: false
+---
+
+# 테스트 규칙 — test/**/*.test.tsx
+
+## 필수 사항
+
+1. 모든 API 호출 모킹 — 실제 엔드포인트 호출 금지
+2. 유효 입력 AND 무효 입력 둘 다 테스트
+3. 사용자 흐름 테스트 — 구현 세부사항 테스트 금지
+4. 비동기 상호작용에 `userEvent.setup()` 사용
+5. `@testing-library/jest-dom` 매처 사용
+
+## 테스트 네이밍
+
+```typescript
+describe('{컴포넌트명}', () => {
+  it('올바르게 렌더링된다')
+  it('{사용자 액션}을 처리한다')
+  it('{조건}일 때 검증 에러를 표시한다')
+  it('{흐름명}을 성공적으로 완료한다')
+})
+```
+
+## API 모킹 패턴
+
+```typescript
+import { vi } from 'vitest'
+
+vi.mock('@/lib/api/courses', () => ({
+  fetchCourses: vi.fn(() => Promise.resolve({
+    courses: mockCourses,
+    categories: ['development', 'design'],
+  })),
+}))
+```
+
+## 컴포넌트 테스트 패턴
+
+```typescript
+import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+
+it('사용자 상호작용을 처리한다', async () => {
+  const user = userEvent.setup()
+  render(<Component {...props} />)
+  await user.click(screen.getByRole('button', { name: /다음/i }))
+  expect(screen.getByText(/기대 결과/i)).toBeInTheDocument()
+})
+```
+
+## 스키마 테스트 패턴
+
+```typescript
+it('유효한 데이터를 받는다', () => {
+  const result = Step1Schema.safeParse(validInput)
+  expect(result.success).toBe(true)
+})
+
+it('잘못된 {필드}를 거부한다', () => {
+  const result = Step1Schema.safeParse({ ...validInput, field: invalidValue })
+  expect(result.success).toBe(false)
+})
+```
+
+## 커버리지 목표: 80%+
+
+## 안티패턴
+
+- ❌ 내부 상태 테스트 (렌더링 결과 테스트)
+- ❌ API 모킹 설정 건너뜀
+- ❌ happy path만 테스트 (에러 경로도 필수)
+- ❌ 테스트 파일에서 `as any`
+- ❌ 빌드 통과용으로 실패하는 테스트 삭제

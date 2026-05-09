@@ -1,0 +1,51 @@
+---
+description: Rules for Zod schema files — safeParse, Korean errors, naming conventions
+globs: lib/schemas/*.ts
+alwaysApply: false
+---
+
+# 스키마 규칙 — lib/schemas/*.ts
+
+## 필수 사항
+
+1. `import { z } from 'zod'`
+2. 스키마 export: `export const {Name}Schema = z.object({...})`
+3. 타입 export: `export type {Name} = z.infer<typeof {Name}Schema>`
+4. 검증은 `safeParse()` — `parse()` 절대 금지
+5. 에러 메시지 모두 한국어
+
+## 스키마 네이밍
+
+```typescript
+Step1Schema           // Step 1: 강의 선택 + 신청 유형
+Step2PersonalSchema   // Step 2: 개인 신청자 정보
+Step2GroupSchema      // Step 2: 단체 신청자 + 참가자
+Step3Schema           // Step 3: 이용약관 동의
+CourseSchema          // 강의 데이터 타입
+```
+
+## 주요 검증 규칙
+
+| 필드 | 규칙 |
+|---|---|
+| name | `z.string().min(2, '이름은 2자 이상이어야 합니다').max(20, '이름은 20자 이하여야 합니다')` |
+| email | `z.string().email('올바른 이메일 형식이 아닙니다')` |
+| phone | `z.string().regex(/^01[016789]-?\d{3,4}-?\d{4}$/, '올바른 전화번호 형식이 아닙니다')` |
+| motivation | `z.string().max(300, '동기는 300자 이하여야 합니다').optional()` |
+| headCount | `z.number().int().min(2, '최소 2명이어야 합니다').max(10, '최대 10명까지 가능합니다')` |
+| agreed | `z.literal(true, { errorMap: () => ({ message: '약관에 동의해야 합니다' }) })` |
+
+## 검증 헬퍼 패턴
+
+```typescript
+export function validateStep1(data: Partial<EnrollmentFormData>) {
+  return Step1Schema.safeParse(data)
+}
+```
+
+## 안티패턴
+
+- ❌ `.parse()` 사용 (`.safeParse()` 사용)
+- ❌ 영어 에러 메시지
+- ❌ 클라이언트/서버 간 스키마 로직 중복
+- ❌ `any` 타입과 스키마 타입 혼용
