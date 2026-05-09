@@ -179,8 +179,8 @@ describe('validateStep2Personal', () => {
     expect(validateStep2Personal({ ...valid, phone: '123-456' }).success).toBe(false)
   })
 
-  it('하이픈 있는 전화번호는 실패 반환', () => {
-    expect(validateStep2Personal({ ...valid, phone: '010-1234-5678' }).success).toBe(false)
+  it('하이픈 있는 전화번호도 성공 반환 (자동 제거)', () => {
+    expect(validateStep2Personal({ ...valid, phone: '010-1234-5678' }).success).toBe(true)
   })
 
   it('수강 동기 300자 초과 시 실패 반환', () => {

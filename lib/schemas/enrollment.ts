@@ -23,7 +23,10 @@ export const Step1Schema = z.object({
 const ApplicantSchema = z.object({
   name: z.string().min(2, '이름은 2자 이상이어야 해요.').max(20, '이름은 20자 이하로 입력해주세요.'),
   email: z.email({ error: '이메일 형식이 올바르지 않아요.' }),
-  phone: z.string().regex(/^01[016789]\d{7,8}$/, '올바른 전화번호 형식이 아니에요. (예: 01012345678)'),
+  phone: z.preprocess(
+    val => (typeof val === 'string' ? val.replace(/-/g, '') : val),
+    z.string().regex(/^01[016789]\d{7,8}$/, '올바른 전화번호 형식이 아니에요. (예: 010-1234-5678)')
+  ),
   motivation: z.string().max(300, '수강 동기는 300자 이하로 입력해주세요.').optional(),
 })
 
@@ -40,7 +43,7 @@ export const Step2GroupSchema = ApplicantSchema.extend({
   ),
   contactPerson: z.string().min(1, '담당자 연락처를 입력해주세요.'),
 }).superRefine((data, ctx) => {
-  if (data.participants.length !== data.headCount) {
+  if (data.participants && data.participants.length !== data.headCount) {
     ctx.addIssue({
       code: 'custom',
       message: '참가자 수가 신청 인원과 일치하지 않아요.',

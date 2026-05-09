@@ -10,21 +10,17 @@ export async function submitEnrollment(data: EnrollmentFormData): Promise<Enroll
     ...(data.motivation ? { motivation: data.motivation } : {}),
   }
 
-  if (data.type === 'group' && (!data.organizationName || data.headCount === undefined || !data.participants || !data.contactPerson)) {
-    throw new Error('단체 신청 정보가 올바르지 않아요.')
-  }
-
   const body =
-    data.type === 'group'
+    data.type === 'group' && data.organizationName && data.headCount !== undefined && data.participants && data.contactPerson
       ? {
           courseId: data.courseId,
           type: 'group' as const,
           applicant,
           group: {
-            organizationName: data.organizationName as string,
-            headCount: data.headCount as number,
-            participants: data.participants as { name: string; email: string }[],
-            contactPerson: data.contactPerson as string,
+            organizationName: data.organizationName,
+            headCount: data.headCount,
+            participants: data.participants,
+            contactPerson: data.contactPerson,
           },
           agreedToTerms: true,
         }
@@ -40,7 +36,10 @@ export async function submitEnrollment(data: EnrollmentFormData): Promise<Enroll
   } catch (error) {
     if (error instanceof HTTPError) {
       const err = await error.response.json().catch(() => ({}))
-      throw new Error((err as { message?: string }).message ?? '신청 제출에 실패했어요.')
+      const message = err && typeof (err as Record<string, unknown>).message === 'string'
+        ? (err as Record<string, unknown>).message as string
+        : '신청 제출에 실패했어요.'
+      throw new Error(message)
     }
     throw new Error('신청 제출에 실패했어요.')
   }
